@@ -255,8 +255,9 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">Posted on</span>
+      
 
-      <time title="Created: 2022-03-08 14:26:58" itemprop="dateCreated datePublished" datetime="2022-03-08T14:26:58+08:00">2022-03-08</time>
+      <time title="Created: 2022-03-08 21:44:44 / Modified: 21:44:36" itemprop="dateCreated datePublished" datetime="2022-03-08T21:44:44+08:00">2022-03-08</time>
     </span>
 
   
@@ -272,7 +273,20 @@
           <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><ul>
 <li>基于该协议的CS可以实现文件共享，最近项目上经常要用到这个服务，这边做下简单的原理性探究，着重于部署配置</li>
 </ul>
-<h1 id="传输模式"><a href="#传输模式" class="headerlink" title="传输模式"></a>传输模式</h1>
+<h1 id="传输模式"><a href="#传输模式" class="headerlink" title="传输模式"></a>传输模式</h1><h1 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h1><p>uid = root<br>gid = root<br>port = 874<br>read only = false<br>write only = false<br>log file = /var/log/rsyncd.log<br>use chroot = true<br>max connections = 4<br>pid file = /var/run/rsyncd.pid<br>exclude = lost+found/<br>timeout = 900<br>[ftp]<br>   path = /root/xiaomage46.github.io/source/_posts<br>   #path = /tmp/test<br>   secrets file = /etc/rsyncd/rsyncd.secrets<br>   auth users = xiaomage<br>   read only = false<br>   write only = false<br>   list = true</p>
+<ul>
+<li>同步命令</li>
+<li>rsync -rltDvz –chmod=Dugo+r,Dugo+x,Du+w,Fugo+r,Fu+w –port=874 –password-file=F:\software\cwrsync_6.2.4_x64_free\passwd.txt /cygdrive/f/Key  <a href="mailto:&#120;&#x69;&#97;&#x6f;&#109;&#97;&#x67;&#x65;&#x40;&#120;&#x69;&#x61;&#x6f;&#x6d;&#x61;&#103;&#101;&#x34;&#54;&#46;&#x63;&#x6e;">&#120;&#x69;&#97;&#x6f;&#109;&#97;&#x67;&#x65;&#x40;&#120;&#x69;&#x61;&#x6f;&#x6d;&#x61;&#103;&#101;&#x34;&#54;&#46;&#x63;&#x6e;</a>::ftp</li>
+</ul>
+<h1 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h1><ul>
+<li>rsync: recv_generator: mkdir “/Key” (in ftp) failed: Permission denied (13)<ul>
+<li>权限问题，所上传文件赋予的权限要和目录本身的权限对应</li>
+<li>uid = root<br>gid = root</li>
+</ul>
+</li>
+</ul>
+<p>yyds</p>
+
       
     </div>
 
