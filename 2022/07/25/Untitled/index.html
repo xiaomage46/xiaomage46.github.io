@@ -22,18 +22,20 @@
     var CONFIG = {"hostname":"xiaomage46.github.io","root":"/","scheme":"Gemini","version":"8.0.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
   </script>
 
-  <meta property="og:type" content="website">
+  <meta name="description" content="[TOC] 前言最近项目中经常遇到的和软中断相关的问题，大多数情况下是因为软中断过高导致程序异常，对于只会关注cpu&#x2F;内存&#x2F;磁盘占用率的我来说，绞尽脑汁也不会想到还有个指标能有这么大的杀伤力 接触 经常在一些系统资源查询的命令中能够看到她的身影，但却不以为然，甚至是完全不知道那个指标是何意义 软中断也叫软件中断即si，而hi则代表硬中断，也叫硬件中断 top中si列可以查看软中断占用cpu时钟">
+<meta property="og:type" content="article">
 <meta property="og:title" content="小马哥的BLOG">
-<meta property="og:url" content="https://xiaomage46.github.io/404.html">
+<meta property="og:url" content="https://xiaomage46.github.io/2022/07/25/Untitled/index.html">
 <meta property="og:site_name" content="小马哥的BLOG">
+<meta property="og:description" content="[TOC] 前言最近项目中经常遇到的和软中断相关的问题，大多数情况下是因为软中断过高导致程序异常，对于只会关注cpu&#x2F;内存&#x2F;磁盘占用率的我来说，绞尽脑汁也不会想到还有个指标能有这么大的杀伤力 接触 经常在一些系统资源查询的命令中能够看到她的身影，但却不以为然，甚至是完全不知道那个指标是何意义 软中断也叫软件中断即si，而hi则代表硬中断，也叫硬件中断 top中si列可以查看软中断占用cpu时钟">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-03-16T05:00:32.634Z">
-<meta property="article:modified_time" content="2022-03-16T05:00:32.634Z">
+<meta property="article:published_time" content="2022-07-25T03:39:26.664Z">
+<meta property="article:modified_time" content="2022-07-19T08:54:05.159Z">
 <meta property="article:author" content="xiaomage">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="https://xiaomage46.github.io/404">
+<link rel="canonical" href="https://xiaomage46.github.io/2022/07/25/Untitled/">
 
 
 <script class="page-configurations">
@@ -41,13 +43,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : false,
+    isPost : true,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title> | 小马哥的BLOG
-</title>
+  <title> | 小马哥的BLOG</title>
   
 
 
@@ -178,7 +179,7 @@
 
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
@@ -190,6 +191,7 @@
 
       <!--noindex-->
       <section class="post-toc-wrap sidebar-panel">
+          <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8E%A5%E8%A7%A6"><span class="nav-number">2.</span> <span class="nav-text">接触</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%A7%E7%94%9F%E5%8E%9F%E5%9B%A0"><span class="nav-number">3.</span> <span class="nav-text">产生原因</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%8E%E8%BD%AF%E4%B8%AD%E6%96%AD%E7%9B%B8%E4%BC%BC%E7%9A%84%E5%8A%A8%E4%BD%9C"><span class="nav-number">4.</span> <span class="nav-text">与软中断相似的动作</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%96%91%E9%97%AE%E7%82%B9"><span class="nav-number">5.</span> <span class="nav-text">疑问点</span></a></li></ol></div>
       </section>
       <!--/noindex-->
 
@@ -232,45 +234,121 @@
 </noscript>
 
 
-    <div class="main-inner page posts-expand">
+    <div class="main-inner post posts-expand">
       
-  
-  
 
       
 
     
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://xiaomage46.github.io/2022/07/25/Untitled/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/xiaomage.png">
+      <meta itemprop="name" content="xiaomage">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小马哥的BLOG">
+    </span>
+
     
     
-    <div class="post-block" lang="zh-CN">
       <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+        </h1>
 
-<h1 class="post-title" itemprop="name headline">
-</h1>
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
 
-<div class="post-meta-container">
+      <time title="创建时间：2022-07-25 11:39:26" itemprop="dateCreated datePublished" datetime="2022-07-25T11:39:26+08:00">2022-07-25</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-07-19 16:54:05" itemprop="dateModified" datetime="2022-07-19T16:54:05+08:00">2022-07-19</time>
+      </span>
+
   
-
 </div>
 
-</header>
+        </div>
+      </header>
 
-      
-      
-      
-      <div class="post-body">
-          <script type="text/javascript" src="//qzonestyle.gtimg.cn/qzone/hybrid/app/404/search_children.js" homepagename='返回主页' homepageurl="/" charset="utf-8"></script>
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <ul>
+<li></li>
+<li><p>[TOC]</p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>最近项目中经常遇到的和软中断相关的问题，大多数情况下是因为软中断过高导致程序异常，对于只会关注cpu/内存/磁盘占用率的我来说，绞尽脑汁也不会想到还有个指标能有这么大的杀伤力</p>
+<h1 id="接触"><a href="#接触" class="headerlink" title="接触"></a>接触</h1><ul>
+<li>经常在一些系统资源查询的命令中能够看到她的身影，但却不以为然，甚至是完全不知道那个指标是何意义<ul>
+<li>软中断也叫软件中断即si，而hi则代表硬中断，也叫硬件中断</li>
+<li>top中si列可以查看软中断占用cpu时钟周期的百分比，以秒为单位</li>
+<li>vmstat中si列可以看到软中断的次数</li>
+<li>通过以上两个值可以大概计算出每次软中断所需要消耗的CPU开销，即周期/次数</li>
+</ul>
+</li>
+</ul>
+<h1 id="产生原因"><a href="#产生原因" class="headerlink" title="产生原因"></a>产生原因</h1><ul>
+<li>CPU正常情况下都在专心处理用户进程指派的任务，当有外接硬件或者软件有消息想要通知CPU，就会通过中断请求（IRQ）的方式来进行，比如鼠标的点击/磁盘读取完数据</li>
+<li>但是中断的机制应用在网络IO时可能会产生一些问题，因为网络数据包收到后的处理工作并没有那样简单，而是需要大量的内核协议栈参与处理，如果只用一种硬中断来处理网络IO，由于硬中断优先级比较高，这样就会导致CPU忙于处理大量的网络IO而不能及时相应键盘鼠标的指令，让操作系统实时性变差</li>
+<li>软件中断的初衷就是配合硬中断来处理网络IO，硬中断可以理解为收包的，收完包不做处理就结束了，不耽误CPU响应其他优先级高的中断，而软中断优先级较低，需要负责将包进行各种处理，完成从驱动层、网络协议栈，最终把处理出来的数据放到socket的接收buffer中，因此软中断处理周期会长上不少</li>
+</ul>
+<h1 id="与软中断相似的动作"><a href="#与软中断相似的动作" class="headerlink" title="与软中断相似的动作"></a>与软中断相似的动作</h1><ul>
+<li>系统调用<ul>
+<li>软中断和系统调用的本质都是让CPE停掉当前用户态上下文，保存现场然后陷入到内核态继续工作。两者唯一的区别是系统调用是切换到同进程的内核态上下文，而软中断则是切换到另一个内核进程ksoftirqd上；系统调用无需进行一致性和安全性检查，因此开销会比软中断少一些</li>
+</ul>
+</li>
+<li>进程上下文切换<ul>
+<li>进程上下文切换是从用户进程切换到另一个用户进程，而软中断时从用户进程切换到内核线程ksofttirqd上，而ksoftirqd作为一个内核线程，处理程序会比用户进程轻量，因此上下文切换开销会比软中断多一些</li>
+</ul>
+</li>
+</ul>
+<h1 id="疑问点"><a href="#疑问点" class="headerlink" title="疑问点"></a>疑问点</h1><ul>
+<li>PDPK有中断么</li>
+</ul>
+</li>
+</ul>
 
-      </div>
-      
-      
-      
     </div>
-    
 
     
     
     
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/07/23/ftp/" rel="prev" title="">
+                  <i class="fa fa-chevron-left"></i> 
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+  
+  
+  
+
 
 
       

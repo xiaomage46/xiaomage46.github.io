@@ -201,7 +201,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">2</span>
+          <span class="site-state-item-count">6</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -237,7 +237,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://xiaomage46.github.io/2022/03/09/ftp/">
+    <link itemprop="mainEntityOfPage" href="https://xiaomage46.github.io/2022/07/25/Untitled/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/xiaomage.png">
@@ -254,7 +254,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/03/09/ftp/" class="post-title-link" itemprop="url">未命名</a>
+            <a href="/2022/07/25/Untitled/" class="post-title-link" itemprop="url">未命名</a>
         </h2>
 
         <div class="post-meta-container">
@@ -264,10 +264,118 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
-      
 
-      <time title="创建时间：2022-03-09 17:52:31 / 修改时间：17:52:17" itemprop="dateCreated datePublished" datetime="2022-03-09T17:52:31+08:00">2022-03-09</time>
+      <time title="创建时间：2022-07-25 11:39:26" itemprop="dateCreated datePublished" datetime="2022-07-25T11:39:26+08:00">2022-07-25</time>
     </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-07-19 16:54:05" itemprop="dateModified" datetime="2022-07-19T16:54:05+08:00">2022-07-19</time>
+      </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <ul>
+<li></li>
+<li><p>[TOC]</p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>最近项目中经常遇到的和软中断相关的问题，大多数情况下是因为软中断过高导致程序异常，对于只会关注cpu/内存/磁盘占用率的我来说，绞尽脑汁也不会想到还有个指标能有这么大的杀伤力</p>
+<h1 id="接触"><a href="#接触" class="headerlink" title="接触"></a>接触</h1><ul>
+<li>经常在一些系统资源查询的命令中能够看到她的身影，但却不以为然，甚至是完全不知道那个指标是何意义<ul>
+<li>软中断也叫软件中断即si，而hi则代表硬中断，也叫硬件中断</li>
+<li>top中si列可以查看软中断占用cpu时钟周期的百分比，以秒为单位</li>
+<li>vmstat中si列可以看到软中断的次数</li>
+<li>通过以上两个值可以大概计算出每次软中断所需要消耗的CPU开销，即周期/次数</li>
+</ul>
+</li>
+</ul>
+<h1 id="产生原因"><a href="#产生原因" class="headerlink" title="产生原因"></a>产生原因</h1><ul>
+<li>CPU正常情况下都在专心处理用户进程指派的任务，当有外接硬件或者软件有消息想要通知CPU，就会通过中断请求（IRQ）的方式来进行，比如鼠标的点击/磁盘读取完数据</li>
+<li>但是中断的机制应用在网络IO时可能会产生一些问题，因为网络数据包收到后的处理工作并没有那样简单，而是需要大量的内核协议栈参与处理，如果只用一种硬中断来处理网络IO，由于硬中断优先级比较高，这样就会导致CPU忙于处理大量的网络IO而不能及时相应键盘鼠标的指令，让操作系统实时性变差</li>
+<li>软件中断的初衷就是配合硬中断来处理网络IO，硬中断可以理解为收包的，收完包不做处理就结束了，不耽误CPU响应其他优先级高的中断，而软中断优先级较低，需要负责将包进行各种处理，完成从驱动层、网络协议栈，最终把处理出来的数据放到socket的接收buffer中，因此软中断处理周期会长上不少</li>
+</ul>
+<h1 id="与软中断相似的动作"><a href="#与软中断相似的动作" class="headerlink" title="与软中断相似的动作"></a>与软中断相似的动作</h1><ul>
+<li>系统调用<ul>
+<li>软中断和系统调用的本质都是让CPE停掉当前用户态上下文，保存现场然后陷入到内核态继续工作。两者唯一的区别是系统调用是切换到同进程的内核态上下文，而软中断则是切换到另一个内核进程ksoftirqd上；系统调用无需进行一致性和安全性检查，因此开销会比软中断少一些</li>
+</ul>
+</li>
+<li>进程上下文切换<ul>
+<li>进程上下文切换是从用户进程切换到另一个用户进程，而软中断时从用户进程切换到内核线程ksofttirqd上，而ksoftirqd作为一个内核线程，处理程序会比用户进程轻量，因此上下文切换开销会比软中断多一些</li>
+</ul>
+</li>
+</ul>
+<h1 id="疑问点"><a href="#疑问点" class="headerlink" title="疑问点"></a>疑问点</h1><ul>
+<li>PDPK有中断么</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://xiaomage46.github.io/2022/07/23/ftp/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/xiaomage.png">
+      <meta itemprop="name" content="xiaomage">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小马哥的BLOG">
+    </span>
+
+    
+    
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/07/23/ftp/" class="post-title-link" itemprop="url">未命名</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-07-23 10:44:18" itemprop="dateCreated datePublished" datetime="2022-07-23T10:44:18+08:00">2022-07-23</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-06-28 10:54:31" itemprop="dateModified" datetime="2022-06-28T10:54:31+08:00">2022-06-28</time>
+      </span>
 
   
 </div>
@@ -285,7 +393,7 @@
 <h1 id="传输模式"><a href="#传输模式" class="headerlink" title="传输模式"></a>传输模式</h1><h1 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h1><p>uid = root<br>gid = root<br>port = 874<br>read only = false<br>write only = false<br>log file = /var/log/rsyncd.log<br>use chroot = true<br>max connections = 4<br>pid file = /var/run/rsyncd.pid<br>exclude = lost+found/<br>timeout = 900<br>[ftp]<br>   path = /root/xiaomage46.github.io/source/_posts<br>   #path = /tmp/test<br>   secrets file = /etc/rsyncd/rsyncd.secrets<br>   auth users = xiaomage<br>   read only = false<br>   write only = false<br>   list = true</p>
 <ul>
 <li>同步命令</li>
-<li>rsync -rltDvz –chmod=Dugo+r,Dugo+x,Du+w,Fugo+r,Fu+w –port=874 –password-file=F:\software\cwrsync_6.2.4_x64_free\passwd.txt /cygdrive/f/Key  <a href="mailto:&#120;&#105;&#97;&#111;&#x6d;&#97;&#103;&#x65;&#64;&#120;&#105;&#97;&#x6f;&#x6d;&#97;&#103;&#101;&#x34;&#54;&#x2e;&#99;&#x6e;">&#120;&#105;&#97;&#111;&#x6d;&#97;&#103;&#x65;&#64;&#120;&#105;&#97;&#x6f;&#x6d;&#97;&#103;&#101;&#x34;&#54;&#x2e;&#99;&#x6e;</a>::ftp</li>
+<li>rsync -rltDvz –chmod=Dugo+r,Dugo+x,Du+w,Fugo+r,Fu+w –port=874 –password-file=F:\software\cwrsync_6.2.4_x64_free\passwd.txt /cygdrive/f/Key  <a href="mailto:&#120;&#x69;&#97;&#x6f;&#109;&#97;&#103;&#101;&#64;&#120;&#105;&#x61;&#x6f;&#x6d;&#x61;&#x67;&#x65;&#x34;&#54;&#x2e;&#x63;&#110;">&#120;&#x69;&#97;&#x6f;&#109;&#97;&#103;&#101;&#64;&#120;&#105;&#x61;&#x6f;&#x6d;&#x61;&#x67;&#x65;&#x34;&#54;&#x2e;&#x63;&#110;</a>::ftp</li>
 </ul>
 <h1 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h1><ul>
 <li>rsync: recv_generator: mkdir “/Key” (in ftp) failed: Permission denied (13)<ul>
@@ -294,7 +402,249 @@
 </ul>
 </li>
 </ul>
-<p>yyds</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://xiaomage46.github.io/2022/07/23/rsync/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/xiaomage.png">
+      <meta itemprop="name" content="xiaomage">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小马哥的BLOG">
+    </span>
+
+    
+    
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/07/23/rsync/" class="post-title-link" itemprop="url">未命名</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-07-23 10:44:17" itemprop="dateCreated datePublished" datetime="2022-07-23T10:44:17+08:00">2022-07-23</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-07-11 16:27:20" itemprop="dateModified" datetime="2022-07-11T16:27:20+08:00">2022-07-11</time>
+      </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><ul>
+<li>基于该协议的CS可以实现文件共享，最近项目上经常要用到这个服务，这边做下简单的原理性探究，着重于部署配置</li>
+</ul>
+<h1 id="传输模式"><a href="#传输模式" class="headerlink" title="传输模式"></a>传输模式</h1><h1 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h1><p>vi /etc/rsyncd.conf</p>
+<p>uid = root<br>gid = root<br>port = 874<br>read only = false<br>write only = false<br>log file = /var/log/rsyncd.log<br>use chroot = true<br>max connections = 4<br>pid file = /var/run/rsyncd.pid<br>exclude = lost+found/<br>timeout = 900<br>[ftp]<br>   path = /root/xiaomage46.github.io/source/_posts<br>   #path = /tmp/test<br>   secrets file = /etc/rsyncd/rsyncd.secrets<br>   auth users = xiaomage<br>   read only = false<br>   write only = false<br>   list = true</p>
+<ul>
+<li><p>同步命令</p>
+</li>
+<li><p>rsync -rltDvz –chmod=Dugo+r,Dugo+x,Du+w,Fugo+r,Fu+w –port=874 –password-file=F:\software\cwrsync_6.2.4_x64_free\passwd.txt /cygdrive/f/Key  <a href="mailto:&#120;&#105;&#x61;&#111;&#109;&#97;&#x67;&#x65;&#64;&#120;&#x69;&#x61;&#111;&#x6d;&#97;&#103;&#101;&#52;&#x36;&#x2e;&#x63;&#110;">&#120;&#105;&#x61;&#111;&#109;&#97;&#x67;&#x65;&#64;&#120;&#x69;&#x61;&#111;&#x6d;&#97;&#103;&#101;&#52;&#x36;&#x2e;&#x63;&#110;</a>::ftp</p>
+</li>
+<li><p>bat脚本：</p>
+</li>
+<li><p>@echo off<br>F:\software\cwrsync_6.2.4_x64_free\bin\rsync.exe -rltDvz –chmod=Dugo+r,Dugo+x,Du+w,Fugo+r,Fu+w –port=874 –password-file=F:\software\cwrsync_6.2.4_x64_free\passwd.txt /cygdrive/f/blog/  <a href="mailto:&#x78;&#x69;&#x61;&#111;&#109;&#x61;&#x67;&#101;&#64;&#x78;&#105;&#x61;&#111;&#109;&#x61;&#x67;&#101;&#52;&#x36;&#x2e;&#x63;&#x6e;">&#x78;&#x69;&#x61;&#111;&#109;&#x61;&#x67;&#101;&#64;&#x78;&#105;&#x61;&#111;&#109;&#x61;&#x67;&#101;&#52;&#x36;&#x2e;&#x63;&#x6e;</a>::ftp<br>F:\software\cwrsync_6.2.4_x64_free\bin\rsync.exe -rltDvz –chmod=Dugo+r,Dugo+x,Du+w,Fugo+r,Fu+w –port=874 –password-file=F:\software\cwrsync_6.2.4_x64_free\passwd.txt <a href="mailto:&#x78;&#x69;&#x61;&#x6f;&#109;&#x61;&#x67;&#101;&#64;&#120;&#105;&#97;&#111;&#x6d;&#x61;&#x67;&#x65;&#52;&#54;&#x2e;&#99;&#110;">&#x78;&#x69;&#x61;&#x6f;&#109;&#x61;&#x67;&#101;&#64;&#120;&#105;&#97;&#111;&#x6d;&#x61;&#x67;&#x65;&#52;&#54;&#x2e;&#99;&#110;</a>::ftp /cygdrive/f/blog/</p>
+<p>exit</p>
+</li>
+</ul>
+<h1 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h1><ul>
+<li>rsync: recv_generator: mkdir “/Key” (in ftp) failed: Permission denied (13)<ul>
+<li>权限问题，所上传文件赋予的权限要和目录本身的权限对应</li>
+<li>uid = root<br>gid = root</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://xiaomage46.github.io/2022/07/23/strongswan/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/xiaomage.png">
+      <meta itemprop="name" content="xiaomage">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小马哥的BLOG">
+    </span>
+
+    
+    
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/07/23/strongswan/" class="post-title-link" itemprop="url">未命名</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-07-23 10:44:17" itemprop="dateCreated datePublished" datetime="2022-07-23T10:44:17+08:00">2022-07-23</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-07-04 12:00:21" itemprop="dateModified" datetime="2022-07-04T12:00:21+08:00">2022-07-04</time>
+      </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><img src="C:\Users\lvmy1\AppData\Roaming\Typora\typora-user-images\image-20220630142756934.png" alt="image-20220630142756934"></p>
+<p>IKEv2有两个阶段的交互过程组成，第一阶段为IKE_SA_INIT交换，第二阶段为IKE_AUTH交换</p>
+<p>常见的载荷类型和代表的含义</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">Notation    Payload</span><br><span class="line">-----------------------------------------</span><br><span class="line">AUTH        Authentication</span><br><span class="line">CERT        Certificate</span><br><span class="line">CERTREQ     Certificate Request</span><br><span class="line">CP          Configuration</span><br><span class="line">D           Delete</span><br><span class="line">EAP         Extensible Authentication</span><br><span class="line">HDR         IKE header (not a payload)</span><br><span class="line">IDi         Identification - Initiator</span><br><span class="line">IDr         Identification - Responder</span><br><span class="line">KE          Key Exchange</span><br><span class="line">Ni, Nr      Nonce</span><br><span class="line">N           Notify</span><br><span class="line">SA          Security Association</span><br><span class="line">SK          Encrypted and Authenticated</span><br><span class="line">TSi         Traffic Selector - Initiator</span><br><span class="line">TSr         Traffic Selector - Responder</span><br><span class="line">V           Vendor ID</span><br></pre></td></tr></table></figure>
+
+<p>第一阶段：IKE_SA_INIT包含SAi1/SAr1、KEi/KEr、Ni/Nr</p>
+<p>SAi1/SAr1 分別表示发起者和响应者可以支持的密码算法套件</p>
+<p>KEi/KEr 和 Ni/Nr 分別表示双方的 Diffie–Hellman 密钥交换內容和一次性随机数</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://xiaomage46.github.io/2022/07/23/test/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/xiaomage.png">
+      <meta itemprop="name" content="xiaomage">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小马哥的BLOG">
+    </span>
+
+    
+    
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/07/23/test/" class="post-title-link" itemprop="url">未命名</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-07-23 10:44:16" itemprop="dateCreated datePublished" datetime="2022-07-23T10:44:16+08:00">2022-07-23</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-06-13 11:30:54" itemprop="dateModified" datetime="2022-06-13T11:30:54+08:00">2022-06-13</time>
+      </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>关于蓝牙mesh组网和wifi组网的探究</p>
+<p>80012326dsafsdafa</p>
+<p>sadfsadfas</p>
+<p>sadfasdfsadf</p>
+<p><img src="https://raw.githubusercontent.com/xiaomage46/image/master/data/image-20220613113018522.png" alt="image-20220613113018522"></p>
 
       
     </div>
